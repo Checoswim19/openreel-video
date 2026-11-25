@@ -31,6 +31,7 @@ import {
   Mic,
   SlidersHorizontal,
   Waves,
+  Megaphone,
 } from "lucide-react";
 import {
   DEFAULT_SILENCE_SETTINGS,
@@ -44,6 +45,7 @@ import {
 } from "../inspector/AutoCutSilenceSection";
 import { AutoEditPanel } from "./AutoEditPanel";
 import { LagunaSwimRecipe } from "./LagunaSwimRecipe";
+import { LagunaPromoRecipe } from "./LagunaPromoRecipe";
 import { AutoCaptionPanel } from "../inspector/AutoCaptionPanel";
 import { NoiseReductionSection } from "../inspector/NoiseReductionSection";
 import { AudioEffectsSection } from "../inspector/AudioEffectsSection";
@@ -68,6 +70,15 @@ const recipes = [
     description:
       "Video vertical para Reels y TikTok, sin silencios, con subtítulos en español con tus colores y tu logo.",
     steps: "4 pasos · En tu navegador",
+  },
+  {
+    id: "promo",
+    name: "Promo Laguna Swim",
+    icon: Megaphone,
+    color: "#0d3b7a",
+    description:
+      "Escribe tu título, beneficios, promoción y contacto: se acomodan solos sobre tus clips, con animación y tus colores.",
+    steps: "1 paso · Tus textos",
   },
   {
     id: "silence",
@@ -246,7 +257,7 @@ export function WorkspaceRecipesPanel() {
                     All recipes
                   </Button>
                   <h3>{recipes.find((r) => r.id === active)?.name}</h3>
-                  {active !== "beats" && (
+                  {active !== "beats" && active !== "promo" && (
                     <Select value={clipId ?? ""} onValueChange={setTarget}>
                       <SelectTrigger
                         aria-label="Recipe source clip"
@@ -272,6 +283,8 @@ export function WorkspaceRecipesPanel() {
                     <AutoEditPanel onClose={() => setActive(null)} />
                   ) : active === "laguna" ? (
                     <LagunaSwimRecipe clipId={clipId} />
+                  ) : active === "promo" ? (
+                    <LagunaPromoRecipe />
                   ) : clipId ? (
                     active === "silence" ? (
                       <AutoCutSilenceSection
