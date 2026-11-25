@@ -52,3 +52,13 @@ describe("wrapPromoText", () => {
     expect(wrapPromoText("Grupos reducidos", 73, 1080)).toBe("Grupos reducidos");
   });
 });
+
+import { verticalFitFor } from "./laguna-swim-style";
+describe("verticalFitFor", () => {
+  it("fills with upright footage, shows landscape footage whole", () => {
+    expect(verticalFitFor(1080, 1920)).toBe("cover");
+    expect(verticalFitFor(478, 850)).toBe("cover");
+    expect(verticalFitFor(1024, 576)).toBe("contain");
+    expect(verticalFitFor(0, 0)).toBe("cover");
+  });
+});

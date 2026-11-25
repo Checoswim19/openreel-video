@@ -21,9 +21,9 @@ test("Estilo Laguna Swim recipe: vertical + brand captions", async ({ page }, te
   const state = await page.evaluate((id) => {
     const s = (window as any).__openreelE2E.project.getState();
     const clip = s.project.timeline.tracks.flatMap((t: any) => t.clips).find((c: any) => c.id === id);
-    return { w: s.project.settings.width, h: s.project.settings.height, fit: clip?.transform?.fitMode };
+    return { w: s.project.settings.width, h: s.project.settings.height, fit: clip?.transform?.fitMode, bg: s.project.timeline.backgroundFillMode };
   }, clipId);
-  expect(state).toEqual({ w: 1080, h: 1920, fit: "cover" });
+  expect(state).toEqual({ w: 1080, h: 1920, fit: "contain", bg: "blur" });
   await recipe.getByRole("button", { name: "Crear subtítulos" }).click();
   await expect(page.getByRole("radio", { name: "Laguna Swim caption style" })).toHaveAttribute("aria-checked", "true");
   await recipe.screenshot({ path: process.env.LAGUNA_SHOT ?? testInfo.outputPath("recipe.png") });

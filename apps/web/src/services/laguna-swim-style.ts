@@ -24,14 +24,31 @@ export function visualClipIds(project: Pick<Project, "timeline" | "mediaLibrary"
 }
 
 /**
- * Switch the sequence to 1080×1920 and make every picture clip fill the frame (cover), so a horizontal recording
- * becomes a full-screen vertical video instead of a small strip with black bars.
+ * How a clip should sit in a vertical frame: upright footage fills it (cover); horizontal footage is shown whole
+ * (contain) over a blurred copy of itself, because cropping a landscape shot to 9:16 keeps only a third of it.
+ */
+export function verticalFitFor(width: number, height: number): "cover" | "contain" {
+  return width > 0 && height > 0 && width > height * 1.05 ? "contain" : "cover";
+}
+
+/**
+ * Switch the sequence to 1080×1920. Upright clips fill the frame; horizontal clips are shown whole over a blurred
+ * background, so nobody at the edges of a landscape shot gets cut off.
  */
 export async function makeVerticalLagunaSwim(): Promise<{ ok: boolean; clips: number; error?: string }> {
   const store = useProjectStore.getState();
   const result = await store.updateSettings({ ...LAGUNA_VERTICAL });
   if (!result.success) return { ok: false, clips: 0, error: result.error?.message ?? "No se pudo cambiar el formato." };
-  const ids = visualClipIds(useProjectStore.getState().project);
-  for (const id of ids) await useProjectStore.getState().updateClipTransform(id, { fitMode: "cover" });
+  const { project } = useProjectStore.getState();
+  const ids = visualClipIds(project);
+  let horizontal = 0;
+  for (const id of ids) {
+    const clip = project.timeline.tracks.flatMap((t) => t.clips).find((c) => c.id === id);
+    const meta = project.mediaLibrary.items.find((m) => m.id === clip?.mediaId)?.metadata;
+    const fitMode = verticalFitFor(meta?.width ?? 0, meta?.height ?? 0);
+    if (fitMode === "contain") horizontal++;
+    await useProjectStore.getState().updateClipTransform(id, { fitMode });
+  }
+  if (horizontal) await useProjectStore.getState().setCanvasBackground("blur", project.timeline.layoutBackgroundColor);
   return { ok: true, clips: ids.length };
 }
