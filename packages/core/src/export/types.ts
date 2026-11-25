@@ -1,3 +1,4 @@
+import type { BrandOverlay } from "./brand-overlay";
 import type { LoudnessTargetSettings } from "../audio/loudness/loudness-normalizer";
 import type { LoudnessExportReport } from "./loudness-export";
 import type { ProxyExportReport } from "../media/proxy-workflow";
@@ -261,6 +262,8 @@ export interface ExportFrameSource {
 
 export interface ExportVideoOptions {
   cachedFrames?: ExportFrameSource;
+  /** Watermark and end card burned into this run's video (see brand-overlay.ts). Never applied to internal renders. */
+  brand?: BrandOverlay;
   /**
    * Per-run encoder preference for the browser (WebCodecs) backend, used by the queue's automatic re-run after a
    * hardware session failed. Only takes effect when the export's encoderChoice is auto/undefined; scoped to this

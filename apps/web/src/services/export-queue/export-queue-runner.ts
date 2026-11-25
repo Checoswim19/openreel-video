@@ -15,6 +15,7 @@ import {
   type Project,
   type VideoExportSettings,
 } from "@openreel/core";
+import { loadBrandOverlay } from "../../config/brand";
 import { ensureProjectFonts } from "../project-fonts";
 import { useProjectStore } from "../../stores/project-store";
 import { useTimelineStore } from "../../stores/timeline-store";
@@ -191,8 +192,10 @@ async function runExportJobWith(engine: ExportEngine, job: ExportJob, project: P
       useProjectStore.getState().syncRenderProcessingFrom(project);
     }
     // Desktop carries the preference in its encoder factory; the browser passes it per run so it never outlives this job.
+    const brand = await loadBrandOverlay();
     generator = engine.exportVideo(project, settings, writable, {
       ...(frameSource ? { cachedFrames: frameSource } : {}),
+      ...(brand ? { brand } : {}),
       ...(!desktop && encoder === "prefer-software" ? { encoderPreference: "prefer-software" as const } : {}),
     });
     let framesFromCache = 0;

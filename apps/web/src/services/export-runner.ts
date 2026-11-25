@@ -10,6 +10,7 @@ import {
   type ExportResult,
   type Project,
 } from "@openreel/core";
+import { loadBrandOverlay } from "../config/brand";
 
 export interface ExportRunnerState {
   isExporting: boolean;
@@ -549,7 +550,12 @@ export function useExportRunner(options: ExportRunnerOptions): UseExportRunner {
               upscaling: videoSettings.upscaling,
             })
           : null;
-        generator = engine.exportVideo(project, videoSettings, writableStream, cachedFrames ? { cachedFrames } : {});
+        const brand = await loadBrandOverlay();
+        checkCurrent();
+        generator = engine.exportVideo(project, videoSettings, writableStream, {
+          ...(cachedFrames ? { cachedFrames } : {}),
+          ...(brand ? { brand } : {}),
+        });
         let finalResult: ExportResult | undefined;
 
         while (true) {

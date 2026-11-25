@@ -8,5 +8,6 @@ export * from "./loudness-export";
 export * from "./export-queue";
 export * from "./stem-export";
 export * from "./zip";
+export * from "./brand-overlay";
 export * from "./gif-encoder";
 export * from "./image-sequence";

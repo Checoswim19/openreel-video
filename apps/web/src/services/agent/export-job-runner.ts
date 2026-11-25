@@ -15,6 +15,7 @@ import {
   webCodecsEncoderOptions,
   type LoudnessTargetSettings,
 } from "@openreel/core";
+import { loadBrandOverlay } from "../../config/brand";
 import { useProjectStore } from "../../stores/project-store";
 import { runStillExport, type StillExportRequest } from "../still-export";
 import { runExportJob } from "../export-queue/export-queue-runner";
@@ -326,7 +327,8 @@ export function createExportJobRunner(): JobRunner {
         const sink = createMemoryWritable();
         let result: ExportResult;
         try {
-          result = await drainExport(engine.exportVideo(project, settings, sink.writable));
+          const brand = await loadBrandOverlay();
+          result = await drainExport(engine.exportVideo(project, settings, sink.writable, brand ? { brand } : {}));
         } finally {
           setEncoderBackendFactory(() => nativeBackendFactory());
         }

@@ -32,6 +32,7 @@ import { UpscalingEngine, getUpscalingEngine } from "../video/upscaling";
 import { getMediaEngine } from "../media/mediabunny-engine";
 import { outputColorForExport } from "./color-output";
 import { hdrExportTargetFor } from "../video/hdr-frame";
+import { applyWatermark, endCardFrameCount, hasBrandOverlay, renderEndCardFrame } from "./brand-overlay";
 import { getWavEncoder } from "../wasm/wav";
 import type { EncoderBackend } from "./encoder-backend";
 import { getEncoderBackendFactory, setEncoderBackendFactory } from "./encoder-backend";
@@ -322,7 +323,10 @@ export class ExportEngine {
       };
     }
 
-    const totalFrames = Math.max(1, Math.ceil(exportDuration * fullSettings.frameRate - 1e-7));
+    // Brand overlay (watermark + end card). HDR float frames are encoded without an 8-bit read-back, so they stay unbranded.
+    const brand = hasBrandOverlay(exportOptions.brand) && !hdrExportTargetFor(project, fullSettings) ? exportOptions.brand : undefined;
+    const contentFrames = Math.max(1, Math.ceil(exportDuration * fullSettings.frameRate - 1e-7));
+    const totalFrames = contentFrames + endCardFrameCount(brand, fullSettings.frameRate);
     if (this.currentExport) {
       return { success: false, error: this.createError("INVALID_SETTINGS", "An export is already running. Wait for it to finish or cancel it before retrying.", "preparing") };
     }
@@ -357,7 +361,8 @@ export class ExportEngine {
       await this.initializeGPUForExport(fullSettings.width, fullSettings.height);
       phase("gpu-init");
       checkCancelled();
-      let smartPlan = await this.planSmartRenderFor(project, fullSettings, backend, exportStart, totalFrames);
+      // Stream-copied spans cannot carry a burned-in watermark, so a branded export re-renders every frame.
+      let smartPlan = brand ? null : await this.planSmartRenderFor(project, fullSettings, backend, exportStart, totalFrames);
       checkCancelled();
       if (smartPlan?.eligible && backend.smartRender?.prepare) {
         const prepared = await backend.smartRender.prepare(smartPlan, (mediaId) => project.mediaLibrary.items.find((item) => item.id === mediaId)?.blob ?? undefined);
@@ -490,6 +495,17 @@ export class ExportEngine {
         checkCancelled();
 
         const time = frameStartTime(frame, fullSettings.frameRate);
+        if (brand?.endCard && frame >= contentFrames) {
+          // End card: the brand logo after the last timeline frame.
+          const card = await renderEndCardFrame(fullSettings.width, fullSettings.height, brand.endCard, time - frameStartTime(contentFrames, fullSettings.frameRate));
+          const pendingCard = this.waitForVideoOperation(backend.addVideoFrame(card, time, 1 / fullSettings.frameRate), abortController.signal, "encoding", undefined, 30_000 * pipelineDepth);
+          pendingCard.catch(() => undefined);
+          pendingEncodes.push(pendingCard);
+          if (pendingEncodes.length >= pipelineDepth) await pendingEncodes.shift();
+          this.currentExport!.framesRendered = frame + 1;
+          yield this.createProgress("rendering", renderProgress(frame + 1), totalFrames, frame + 1, backend.getBytesWritten());
+          continue;
+        }
         // The sequence frame on screen at this export instant (the project rate's frame, conformed to the export rate).
         const renderTime = exportRenderTime(frame, fullSettings.frameRate, project.settings.frameRate, exportStart);
         const renderStart = performance.now();
@@ -522,6 +538,8 @@ export class ExportEngine {
           frameImage.close();
           frameImage = upscaled;
         }
+
+        if (brand?.watermark) frameImage = await applyWatermark(frameImage, brand.watermark);
 
         // Queue the encode so the next frame can render while this one is
         // read back. The backend receives frames in call order; the queue is

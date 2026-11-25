@@ -1,6 +1,6 @@
 {
-  "name": "OpenReel",
-  "short_name": "OpenReel",
+  "name": "Laguna Swim Video",
+  "short_name": "Laguna Swim",
   "description": "Professional browser-based video, audio, and photo editing application",
   "start_url": "/",
   "display": "standalone",
