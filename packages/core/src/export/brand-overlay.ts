@@ -18,6 +18,8 @@ export interface BrandWatermark {
   scale: number;
   /** Gap from the frame edge as a fraction of the frame's shorter side. */
   margin: number;
+  /** Optional CSS colour of a soft halo behind the watermark, so a dark logo stays readable on dark or busy footage. */
+  glow?: string;
 }
 
 export interface BrandEndCard {
@@ -116,6 +118,12 @@ export async function applyWatermark(frame: ImageBitmap, watermark: BrandWaterma
   frame.close();
   const rect = watermarkRect(watermark, watermark.image.width, watermark.image.height, width, height);
   ctx.globalAlpha = Math.max(0, Math.min(1, watermark.opacity));
+  if (watermark.glow) {
+    ctx.shadowColor = watermark.glow;
+    ctx.shadowBlur = Math.max(2, Math.round(rect.height * 0.06));
+    // Two passes build a denser halo than one blur alone.
+    ctx.drawImage(watermark.image, rect.x, rect.y, rect.width, rect.height);
+  }
   ctx.drawImage(watermark.image, rect.x, rect.y, rect.width, rect.height);
   return canvas.transferToImageBitmap();
 }

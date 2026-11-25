@@ -12,24 +12,26 @@ export const BRAND_CONFIG = {
   watermark: {
     enabled: true,
     /** Image burned into every frame. */
-    src: "/brand/laguna-swim-logo.svg",
+    src: "/brand/laguna-swim-logo.png",
     position: "bottom-right" as WatermarkPosition,
     /** 0 = invisible, 1 = solid. */
-    opacity: 0.6,
+    opacity: 0.75,
     /** Width as a fraction of the video's shorter side. */
-    scale: 0.22,
+    scale: 0.18,
     /** Distance from the edge as a fraction of the video's shorter side. */
     margin: 0.04,
+    /** Soft white halo so the blue logo stays visible over water. Set to undefined to turn it off. */
+    glow: "rgba(255, 255, 255, 0.95)" as string | undefined,
   },
   endCard: {
     enabled: true,
     /** Logo shown at the end of every video. */
-    src: "/brand/laguna-swim-logo.svg",
+    src: "/brand/laguna-swim-logo.png",
     /** Seconds. */
     duration: 2.5,
-    background: "#0b3a5b",
+    background: "#ffffff",
     /** Width as a fraction of the video's shorter side. */
-    scale: 0.7,
+    scale: 0.6,
     fadeIn: 0.5,
   },
 } as const;
@@ -80,6 +82,7 @@ export async function loadBrandOverlay(): Promise<BrandOverlay | undefined> {
         opacity: watermark.opacity,
         scale: watermark.scale,
         margin: watermark.margin,
+        glow: watermark.glow,
       };
     }
     if (endCard.enabled) {
