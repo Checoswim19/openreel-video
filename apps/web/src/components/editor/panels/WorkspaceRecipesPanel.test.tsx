@@ -159,7 +159,7 @@ describe("recipe progress cards", () => {
     expect(
       screen.queryByRole("button", { name: "Cut 1" }),
     ).not.toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: "Run" })).toHaveLength(4);
+    expect(screen.getAllByRole("button", { name: "Run" })).toHaveLength(5);
   });
 
   it("shows engine progress on the running card and waits for review before applying cuts", async () => {

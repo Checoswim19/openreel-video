@@ -7,7 +7,7 @@ import { getReferenceCaptionStyle } from "./reference-caption-style";
 export const CAPTION_SAMPLE = "Words that stick";
 
 export function captionStyleLabel(id: string): string {
-  return id === "pop-words" ? "Pop words" : id === "default" ? "Classic" : id[0].toUpperCase() + id.slice(1).replaceAll("-", " ");
+  return id === "laguna-swim" ? "Laguna Swim" : id === "pop-words" ? "Pop words" : id === "default" ? "Classic" : id[0].toUpperCase() + id.slice(1).replaceAll("-", " ");
 }
 
 /** The text style a caption preset actually produces: the authored reference style when the workspace applies it, else the subtitle preset. */

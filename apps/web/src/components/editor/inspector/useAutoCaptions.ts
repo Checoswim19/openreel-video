@@ -11,6 +11,7 @@ import { DEFAULT_WHISPER_MODEL, WHISPER_MODELS, isWhisperModelKey, type WhisperM
 import { isDesktopRenderer } from "../../../workers/whisper-threads";
 
 export const CAPTION_STYLE_PRESETS = [
+  "laguna-swim",
   "pop-words",
   "default",
   "modern",

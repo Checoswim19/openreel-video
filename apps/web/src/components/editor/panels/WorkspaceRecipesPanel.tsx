@@ -30,6 +30,7 @@ import {
   ChevronLeft,
   Mic,
   SlidersHorizontal,
+  Waves,
 } from "lucide-react";
 import {
   DEFAULT_SILENCE_SETTINGS,
@@ -42,6 +43,7 @@ import {
   type SilenceActivity,
 } from "../inspector/AutoCutSilenceSection";
 import { AutoEditPanel } from "./AutoEditPanel";
+import { LagunaSwimRecipe } from "./LagunaSwimRecipe";
 import { AutoCaptionPanel } from "../inspector/AutoCaptionPanel";
 import { NoiseReductionSection } from "../inspector/NoiseReductionSection";
 import { AudioEffectsSection } from "../inspector/AudioEffectsSection";
@@ -58,6 +60,15 @@ import {
 } from "../../../services/clip-recipes";
 import { toast } from "../../../stores/notification-store";
 const recipes = [
+  {
+    id: "laguna",
+    name: "Estilo Laguna Swim",
+    icon: Waves,
+    color: "#29a3e3",
+    description:
+      "Video vertical para Reels y TikTok, sin silencios, con subtítulos en español con tus colores y tu logo.",
+    steps: "4 pasos · En tu navegador",
+  },
   {
     id: "silence",
     name: "Remove silences",
@@ -259,6 +270,8 @@ export function WorkspaceRecipesPanel() {
                   )}
                   {active === "beats" ? (
                     <AutoEditPanel onClose={() => setActive(null)} />
+                  ) : active === "laguna" ? (
+                    <LagunaSwimRecipe clipId={clipId} />
                   ) : clipId ? (
                     active === "silence" ? (
                       <AutoCutSilenceSection

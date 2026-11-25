@@ -59,6 +59,18 @@ export const SUBTITLE_STYLE_PRESETS: Record<string, SubtitleStyle> = {
     backgroundColor: "rgba(0, 0, 0, 0.75)",
     position: "center",
   },
+  /** Laguna Swim brand captions: white on the logo's navy, the active word in the logo's light blue. */
+  "laguna-swim": {
+    fontFamily: "Inter",
+    fontSize: 28,
+    color: "#ffffff",
+    backgroundColor: "#0d3b7a",
+    highlightColor: "#29a3e3",
+    position: "bottom",
+    boxPaddingX: 14,
+    boxPaddingY: 4,
+    boxRadius: 10,
+  },
 };
 
 interface SRTParseResult {

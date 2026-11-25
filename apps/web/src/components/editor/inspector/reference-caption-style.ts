@@ -9,6 +9,7 @@ export function getReferenceCaptionStyle(preset: string, frameHeight: number): P
     case "pop-words": return { ...base, fontWeight: 800, color: "#111111", backgroundColor: "#f5d547" };
     case "bold": return { ...base, fontWeight: 900, strokeColor: "#000000", strokeWidth: fontSize / 9 };
     case "minimal": return { ...base, fontWeight: 500 };
+    case "laguna-swim": return { ...base, fontWeight: 800, backgroundColor: "#0d3b7a" };
     default: return undefined;
   }
 }
